@@ -20,15 +20,4 @@ foreach (Item item in items)
     Console.WriteLine(item.Info());
 }
 
-bool running = true;
-while (running)
-{
-
-
-
-
-
-
-}
-
 

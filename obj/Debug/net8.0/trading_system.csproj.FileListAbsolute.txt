@@ -12,3 +12,4 @@ C:\Users\ebadi\repos\trading_system\obj\Debug\net8.0\refint\trading_system.dll
 C:\Users\ebadi\repos\trading_system\obj\Debug\net8.0\trading_system.pdb
 C:\Users\ebadi\repos\trading_system\obj\Debug\net8.0\trading_system.genruntimeconfig.cache
 C:\Users\ebadi\repos\trading_system\obj\Debug\net8.0\ref\trading_system.dll
+C:\Users\ebadi\repos\trading_system\obj\Debug\net8.0\trading_system.sourcelink.json
