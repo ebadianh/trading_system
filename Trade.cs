@@ -8,5 +8,6 @@ class Trade
         Pending,
         Denied,
         Accepted,
+        Completed,
     }
 }

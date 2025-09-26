@@ -17,18 +17,13 @@ bool running = true;
 while (running)
 {
 
-
-
-
-    bool Menurunning = true;
-    while (Menurunning)
+    if (active_user == null)
     {
         Console.WriteLine("--- Welcome to the trading market ---");
-        Console.WriteLine("");
+        Console.WriteLine();
         Console.WriteLine("Please choose where you want to go");
         Console.WriteLine("1. I'm new and would like to have an account");
         Console.WriteLine("2. Login");
-        Console.WriteLine("3. Exit");
 
         string menuinput = Console.ReadLine();
 
@@ -75,30 +70,25 @@ while (running)
                         if (user.TryLogin(username, password))
                         {
                             active_user = user;
-                            Console.WriteLine("--- Welcome dear " + user.Email + " ---");
-                            Console.WriteLine("");
-                            Console.WriteLine("1. Upload your item you like to trade");
-                            Console.WriteLine("2. Browse through items from other users");
-                            Console.WriteLine("3. Logout");
                             break;
                         }
-                        string InlogMenu = Console.ReadLine();
-                        switch (InlogMenu)
-                        {
-                            case "1":
-                                break;
 
-
-                        }
                     }
                 }
                 break;
-
-            default:
-                Console.WriteLine("Invalid choice, try again please");
-                break;
         }
-
+    }
+    else
+    {
+        Console.WriteLine("--- Welcome dear user ---");
+        Console.WriteLine();
+        Console.WriteLine("1. Upload item");
+        Console.WriteLine("2. Browse trough items");
+        Console.WriteLine("3. Request a trade from another");
+        Console.WriteLine("4. Browse trade requests");
+        Console.WriteLine("5. Accept or deny a request");
+        Console.WriteLine("6. Browse trough completed trades");
+        break;
 
     }
 
@@ -124,3 +114,11 @@ while (running)
 // }
 // }
 
+
+///// 
+///     active_user = user;
+//Console.WriteLine("--- Welcome dear " + user.Email + " ---");
+// Console.WriteLine("");
+// Console.WriteLine("1. Upload your item you like to trade");
+// Console.WriteLine("2. Browse through items from other users");
+// Console.WriteLine("3. Logout");
