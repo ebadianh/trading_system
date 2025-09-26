@@ -88,12 +88,37 @@ while (running)
         Console.WriteLine("4. Browse trade requests");
         Console.WriteLine("5. Accept or deny a request");
         Console.WriteLine("6. Browse trough completed trades");
-        break;
 
+        string Userinput = Console.ReadLine();
+
+        switch (Userinput)
+        {
+            case "1":
+                Console.WriteLine("Insert the name of your item");
+                string ItemName = Console.ReadLine();
+
+                if (ItemName == null)
+                {
+                    Console.WriteLine("Unvalid insert. please try again");
+                    break;
+                }
+                Console.WriteLine("Give a short description of your item");
+                string ItemDesc = Console.ReadLine();
+
+                if (ItemDesc == null)
+                {
+                    Console.WriteLine("Unvalid insert, please try again");
+                    break;
+                }
+                break;
+
+        }
     }
-
-
 }
+
+
+
+
 // if (active_user == null)
 // {
 //     Console.Write("Username: ");

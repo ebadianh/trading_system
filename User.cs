@@ -4,15 +4,17 @@ class User
 {
     public string Email;
     private string _password;
+    public List<Item> Items;
 
 
     public User(string email, string password)
     {
         Email = email;
         _password = password;
+        Items = new List<Item>();
     }
 
-    public List<Item> item = new List<Item>();
+
 
     public bool TryLogin(string username, string password)
     {
