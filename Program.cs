@@ -17,17 +17,18 @@ bool running = true;
 while (running)
 {
 
-    Console.WriteLine("--- Welcome to the trading market ---");
-    Console.WriteLine("");
-    Console.WriteLine("Please choose where you want to go");
-    Console.WriteLine("1. I'm new and would like to have an account");
-    Console.WriteLine("2. Login");
-    Console.WriteLine("3. Exit");
+
+
 
     bool Menurunning = true;
     while (Menurunning)
-
     {
+        Console.WriteLine("--- Welcome to the trading market ---");
+        Console.WriteLine("");
+        Console.WriteLine("Please choose where you want to go");
+        Console.WriteLine("1. I'm new and would like to have an account");
+        Console.WriteLine("2. Login");
+        Console.WriteLine("3. Exit");
 
         string menuinput = Console.ReadLine();
 
