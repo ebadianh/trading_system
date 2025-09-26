@@ -10,29 +10,20 @@ items.Add(new Item("Stol", "Jag vill byta min gröna stol som är i bra skick. J
 
 User? active_user = null;
 
-// // User
-// foreach (User user in users)
-// {
-//     Console.WriteLine(user.Email);
-// }
 
-// // Item + Description
-// foreach (Item item in items)
-// {
-//     Console.WriteLine(item.Info());
-// }
 
-Console.Clear();
-Console.WriteLine("--- Welcome to the trading market ---");
-Console.WriteLine("");
-Console.WriteLine("Please choose where you want to go");
-Console.WriteLine("1. I'm new and would like to have an account");
-Console.WriteLine("2. Login");
-Console.WriteLine("3. Exit");
 
 bool running = true;
 while (running)
 {
+
+    Console.WriteLine("--- Welcome to the trading market ---");
+    Console.WriteLine("");
+    Console.WriteLine("Please choose where you want to go");
+    Console.WriteLine("1. I'm new and would like to have an account");
+    Console.WriteLine("2. Login");
+    Console.WriteLine("3. Exit");
+
     bool Menurunning = true;
     while (Menurunning)
 
@@ -62,55 +53,55 @@ while (running)
                 {
                     Console.WriteLine("Username is already taken");
                 }
-                else if (exist = false)
-                {
-                    users.Add(new User(newUsername, newPassword));
-                }
                 else
                 {
+                    users.Add(new User(newUsername, newPassword));
                     Console.WriteLine("Added");
                 }
                 break;
 
-                // case "2":
-                //     if (active_user == null)
-                //     {
-                //         Console.WriteLine("Username: ");
-                //         string username = Console.ReadLine();
+            case "2":
+                if (active_user == null)
+                {
+                    Console.WriteLine("Username: ");
+                    string username = Console.ReadLine();
 
-                //         Console.WriteLine("Password: ");
-                //         string password = Console.ReadLine();
+                    Console.WriteLine("Password: ");
+                    string password = Console.ReadLine();
 
-                //         foreach (User user in users)
-                //         {
-                //             if (user.TryLogin(username, password))
-                //             {
-                //                 active_user = user;
-                //                 break;
-                //             }
-                //         }
-                //     }
-                //     else
-                //     {
-                //         Console.WriteLine("--- Welcome dear user ---");
-                //     }
-                //     break;
-
-                // case "3":
-                //     active_user = null;
-                //     Menurunning = false;
-                //     break;
-
-                // default:
-                //     Console.WriteLine("Invalid choice, try again please");
-                //     break;
+                    foreach (User user in users)
+                    {
+                        if (user.TryLogin(username, password))
+                        {
+                            active_user = user;
+                            Console.WriteLine("--- Welcome dear " + user.Email + " ---");
+                            Console.WriteLine("");
+                            Console.WriteLine("1. Upload your item you like to trade");
+                            Console.WriteLine("2. Browse through items from other users");
+                            Console.WriteLine("3. Logout");
+                            break;
+                        }
+                        string InlogMenu = Console.ReadLine();
+                        switch (InlogMenu)
+                        {
+                            case "1":
+                                break;
 
 
+                        }
+                    }
+                }
+                break;
+
+            default:
+                Console.WriteLine("Invalid choice, try again please");
+                break;
         }
+
+
     }
 
-    // active_user = null;
-    // Menurunning = false;
+
 }
 // if (active_user == null)
 // {

@@ -12,7 +12,7 @@ class User
         _password = password;
     }
 
-
+    public List<Item> item = new List<Item>();
 
     public bool TryLogin(string username, string password)
     {
