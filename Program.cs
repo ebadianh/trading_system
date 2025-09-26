@@ -22,6 +22,13 @@ User? active_user = null;
 //     Console.WriteLine(item.Info());
 // }
 
+Console.Clear();
+Console.WriteLine("--- Welcome to the trading market ---");
+Console.WriteLine("");
+Console.WriteLine("Please choose where you want to go");
+Console.WriteLine("1. I'm new and would like to have an account");
+Console.WriteLine("2. Login");
+Console.WriteLine("3. Exit");
 
 bool running = true;
 while (running)
@@ -30,13 +37,7 @@ while (running)
     while (Menurunning)
 
     {
-        Console.Clear();
-        Console.WriteLine("--- Welcome to the trading market ---");
-        Console.WriteLine("");
-        Console.WriteLine("Please choose where you want to go");
-        Console.WriteLine("1. I'm new and would like to have an account");
-        Console.WriteLine("2. Login");
-        Console.WriteLine("3. Exit");
+
         string menuinput = Console.ReadLine();
 
         switch (menuinput)
@@ -71,45 +72,45 @@ while (running)
                 }
                 break;
 
-            case "2":
-                if (active_user == null)
-                {
-                    Console.WriteLine("Username: ");
-                    string username = Console.ReadLine();
+                // case "2":
+                //     if (active_user == null)
+                //     {
+                //         Console.WriteLine("Username: ");
+                //         string username = Console.ReadLine();
 
-                    Console.WriteLine("Password: ");
-                    string password = Console.ReadLine();
+                //         Console.WriteLine("Password: ");
+                //         string password = Console.ReadLine();
 
-                    foreach (User user in users)
-                    {
-                        if (user.TryLogin(username, password))
-                        {
-                            active_user = user;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("--- Welcome dear user ---");
-                }
-                break;
+                //         foreach (User user in users)
+                //         {
+                //             if (user.TryLogin(username, password))
+                //             {
+                //                 active_user = user;
+                //                 break;
+                //             }
+                //         }
+                //     }
+                //     else
+                //     {
+                //         Console.WriteLine("--- Welcome dear user ---");
+                //     }
+                //     break;
 
-            case "3":
-                active_user = null;
-                Menurunning = false;
-                break;
+                // case "3":
+                //     active_user = null;
+                //     Menurunning = false;
+                //     break;
 
-            default:
-                Console.WriteLine("Invalid choice, try again please");
-                break;
+                // default:
+                //     Console.WriteLine("Invalid choice, try again please");
+                //     break;
 
 
         }
     }
 
-    active_user = null;
-    Menurunning = false;
+    // active_user = null;
+    // Menurunning = false;
 }
 // if (active_user == null)
 // {
