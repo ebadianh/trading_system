@@ -88,6 +88,7 @@ while (running)
         Console.WriteLine("4. Browse trade requests");
         Console.WriteLine("5. Accept or deny a request");
         Console.WriteLine("6. Browse trough completed trades");
+        Console.WriteLine("7. Logout");
 
         string Userinput = Console.ReadLine();
 
@@ -97,7 +98,7 @@ while (running)
                 Console.WriteLine("Insert the name of your item");
                 string ItemName = Console.ReadLine();
 
-                if (ItemName == null)
+                if (ItemName == "")
                 {
                     Console.WriteLine("Unvalid insert. please try again");
                     break;
@@ -105,45 +106,33 @@ while (running)
                 Console.WriteLine("Give a short description of your item");
                 string ItemDesc = Console.ReadLine();
 
-                if (ItemDesc == null)
+                if (ItemDesc == "")
                 {
                     Console.WriteLine("Unvalid insert, please try again");
                     break;
                 }
+                Item newItem = new Item(ItemName, ItemDesc);
+                items.Add(newItem);
+                active_user.Items.Add(newItem);
+
+                Console.WriteLine("Item uploaded");
+                Console.WriteLine("");
+                Console.WriteLine("");
                 break;
 
+            case "2":
+                foreach (Item item in items)
+                {
+                    Console.WriteLine(item.Info());
+                }
+                break;
+
+            case "7":
+                active_user = null;
+                break;
+            default:
+                Console.WriteLine("Unvalid insert, try again");
+                break;
         }
     }
 }
-
-
-
-
-// if (active_user == null)
-// {
-//     Console.Write("Username: ");
-//     string username = Console.ReadLine();
-
-//     Console.Write("Password: ");
-//     string _password = Console.ReadLine();
-
-//     foreach (User user in users)
-//     {
-
-//         if (user.TryLogin(username, _password))
-//         {
-//             active_user = user;
-//             break;
-//         }
-//     }
-// }
-// }
-
-
-///// 
-///     active_user = user;
-//Console.WriteLine("--- Welcome dear " + user.Email + " ---");
-// Console.WriteLine("");
-// Console.WriteLine("1. Upload your item you like to trade");
-// Console.WriteLine("2. Browse through items from other users");
-// Console.WriteLine("3. Logout");
