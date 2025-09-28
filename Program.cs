@@ -11,14 +11,14 @@ items.Add(new Item("Stol", "Jag vill byta min gröna stol som är i bra skick. J
 User? active_user = null;
 
 
-
+Console.Clear();
 
 bool running = true;
 while (running)
 {
-
     if (active_user == null)
     {
+
         Console.WriteLine("--- Welcome to the trading market ---");
         Console.WriteLine();
         Console.WriteLine("Please choose where you want to go");
@@ -26,7 +26,6 @@ while (running)
         Console.WriteLine("2. Login");
 
         string menuinput = Console.ReadLine();
-
         switch (menuinput)
         {
             case "1":
@@ -121,9 +120,14 @@ while (running)
                 break;
 
             case "2":
-                foreach (Item item in items)
+                Console.WriteLine("--- Uploaded items ---");
+                foreach (User user in users)
                 {
-                    Console.WriteLine(item.Info());
+                    foreach (Item item in items)
+                    {
+                        Console.WriteLine(user.Email + " want's to trade this items:");
+                        Console.WriteLine(item.Info());
+                    }
                 }
                 break;
 
