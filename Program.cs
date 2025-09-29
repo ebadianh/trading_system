@@ -1,14 +1,19 @@
 ﻿using System.Reflection.Metadata;
+using Microsoft.VisualBasic;
 using TradingApp;
 
+User? active_user = null;
+
+User testUser1 = new User("Havash", "1");
+User testUser2 = new User("Sofie", "1");
+
 List<User> users = new List<User>();
-users.Add(new User("Havash", "1"));
+users.Add(testUser1);
+users.Add(testUser2);
 
 List<Item> items = new List<Item>();
-items.Add(new Item("Stol", "Jag vill byta min gröna stol som är i bra skick. Jag har haft den i köket i tre år och inga småbarn har varit med i bilden"));
-
-
-User? active_user = null;
+items.Add(new Item("Stol", "Grön färg, lite sliten.", testUser1));
+items.Add(new Item("iPhone 13 Pro Max", "Sprucken skärm.", testUser2));
 
 
 Console.Clear();
@@ -110,7 +115,7 @@ while (running)
                     Console.WriteLine("Unvalid insert, please try again");
                     break;
                 }
-                Item newItem = new Item(ItemName, ItemDesc);
+                Item newItem = new Item(ItemName, ItemDesc, active_user);
                 items.Add(newItem);
                 active_user.Items.Add(newItem);
 
@@ -120,14 +125,10 @@ while (running)
                 break;
 
             case "2":
-                Console.WriteLine("--- Uploaded items ---");
-                foreach (User user in users)
+                Console.WriteLine("--- All the uploaded items ---");
+                foreach (Item item in items)
                 {
-                    foreach (Item item in items)
-                    {
-                        Console.WriteLine(user.Email + " want's to trade this items:");
-                        Console.WriteLine(item.Info());
-                    }
+                    Console.WriteLine(item.Info());
                 }
                 break;
 

@@ -4,18 +4,21 @@ namespace TradingApp;
 
 class Item
 {
-    string ItemName;
-    string Description;
+    public string ItemName;
+    public string Description;
+    public User Owner;
 
-    public Item(string itemname, string description)
+
+    public Item(string itemname, string description, User owner)
     {
         ItemName = itemname;
         Description = description;
+        Owner = owner;
     }
 
 
     public string Info()
     {
-        return ItemName + ":" + " " + Description;
+        return Owner.Email + ": " + ItemName + " " + Description;
     }
 }
