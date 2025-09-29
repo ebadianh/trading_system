@@ -6,14 +6,17 @@ User? active_user = null;
 
 User testUser1 = new User("Havash", "1");
 User testUser2 = new User("Sofie", "1");
+User testUser3 = new User("Belle", "1");
 
 List<User> users = new List<User>();
 users.Add(testUser1);
 users.Add(testUser2);
+users.Add(testUser3);
 
 List<Item> items = new List<Item>();
 items.Add(new Item("Stol", "Grön färg, lite sliten.", testUser1));
 items.Add(new Item("iPhone 13 Pro Max", "Sprucken skärm.", testUser2));
+items.Add(new Item("Barnsäng", "90x90 i topp skick.", testUser3));
 
 
 Console.Clear();
@@ -130,6 +133,15 @@ while (running)
                 {
                     Console.WriteLine(item.Info());
                 }
+                break;
+
+            case "3":
+                Console.WriteLine("Send a request of an item you like to trade");
+                foreach (Item item in items)
+                {
+                    Console.WriteLine(item.Info());
+                }
+                string ReqInput = Console.ReadLine();
                 break;
 
             case "7":
