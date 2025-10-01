@@ -18,8 +18,11 @@ items.Add(new Item("Stol", "Grön färg, lite sliten.", testUser1));
 items.Add(new Item("iPhone 13 Pro Max", "Sprucken skärm.", testUser2));
 items.Add(new Item("Barnsäng", "90x90 i topp skick.", testUser3));
 
+List<Trade> trades = new List<Trade>();
+
 
 Console.Clear();
+
 
 bool running = true;
 while (running)
@@ -136,12 +139,36 @@ while (running)
                 break;
 
             case "3":
-                Console.WriteLine("Send a request of an item you like to trade");
-                foreach (Item item in items)
+                Console.WriteLine("Pick a number from the list you would like to trade with");
+                for (int i = 0; i < items.Count; ++i) //loopar igenom items
                 {
-                    Console.WriteLine(item.Info());
+                    Console.WriteLine(i + 1 + ": " + items[i].Info()); //skriver ut nummer med items
                 }
+
                 string ReqInput = Console.ReadLine();
+
+                if (!int.TryParse(ReqInput, out int choice)) // från text till heltal
+                {
+                    Console.WriteLine("Write a number");
+                    break;
+                }
+                if (choice < 1 || choice > items.Count) // väljer en siffra som inte är med
+                {
+                    Console.WriteLine("Number doesnt exist");
+                    break;
+                }
+                Item chosenItem = items[choice - 1];
+
+                if (chosenItem.Owner == active_user) //om du väljer ditt egna item
+                {
+                    Console.WriteLine("Your own");
+                    break;
+                }
+
+                Trade newTrade = new Trade(active_user, chosenItem.Owner, chosenItem);
+                trades.Add(newTrade); // skapar en ny trade i trade-listan
+
+                Console.WriteLine("Request sended");
                 break;
 
             case "7":
