@@ -29,12 +29,18 @@ while (running)
 {
     if (active_user == null)
     {
-
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine("--- Welcome to the trading market ---");
         Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.WriteLine("Please choose where you want to go");
+        Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine("1. I'm new and would like to have an account");
+        Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.WriteLine("2. Login");
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.WriteLine("3. Exit");
+        Console.ResetColor();
 
         string menuinput = Console.ReadLine();
         switch (menuinput)
@@ -82,9 +88,12 @@ while (running)
                             active_user = user;
                             break;
                         }
-
                     }
                 }
+                break;
+
+            case "3":
+                running = false;
                 break;
         }
     }
@@ -138,6 +147,7 @@ while (running)
                 }
                 break;
 
+
             case "3":
                 Console.WriteLine("Pick a number from the list you would like to trade with");
                 for (int i = 0; i < items.Count; ++i) //loopar igenom items
@@ -170,6 +180,12 @@ while (running)
 
                 Console.WriteLine("Request sended");
                 break;
+
+            case "4":
+                Console.WriteLine("See your trade requests");
+                List<Trade> incomingTrades = new List<Trade>();
+
+
 
             case "7":
                 active_user = null;

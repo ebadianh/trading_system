@@ -7,18 +7,18 @@ class Trade
     public User To;
     public User From;
     public Item Item;
-    // public TradingStatus Status;
+    public TradingStatus Status;
 
     public Trade(User to, User from, Item item)
     {
         To = to;
         From = from;
         Item = item;
-        // Status = TradingStatus.Pending;
+        Status = TradingStatus.Pending;
     }
 
 
-    enum TradingStatus
+    public enum TradingStatus
     {
         None,
         Pending,
