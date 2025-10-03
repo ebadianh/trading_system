@@ -21,4 +21,10 @@ class Item
     {
         return Owner.Email + ": " + ItemName + " " + Description;
     }
+
+    public string Info2()
+    {
+        return ItemName + " " + Description;
+    }
+
 }

@@ -107,7 +107,8 @@ while (running)
         Console.WriteLine("4. Browse trade requests");
         Console.WriteLine("5. Accept or deny a request");
         Console.WriteLine("6. Browse trough completed trades");
-        Console.WriteLine("7. Logout");
+        Console.WriteLine("7. See your sended requests");
+        Console.WriteLine("8. Logout");
 
         string Userinput = Console.ReadLine();
 
@@ -176,6 +177,7 @@ while (running)
                 }
 
                 Trade newTrade = new Trade(active_user, chosenItem.Owner, chosenItem);
+                newTrade.OfferedItem = chosenItem;
                 trades.Add(newTrade); // skapar en ny trade i trade-listan
 
                 Console.WriteLine("Request sended");
@@ -184,10 +186,66 @@ while (running)
             case "4":
                 Console.WriteLine("See your trade requests");
                 List<Trade> incomingTrades = new List<Trade>();
+                foreach (Trade trade in trades)
+                {
+                    if (trade.From == active_user && trade.Status == Trade.TradingStatus.Pending)
+                    {
+                        incomingTrades.Add(trade);
+                    }
+                }
+                if (incomingTrades.Count == 0)
+                {
+                    Console.WriteLine("No requests for now");
+                    break;
+                }
+                for (int i = 0; i < incomingTrades.Count; ++i)
+                {
+                    Trade now = incomingTrades[i];
+                    Console.WriteLine((i + 1) + ". " + now.To.Email + " has send a request for your " + now.Item.Info2()
+                    // + "The senders item is: " + now.OfferedItem.Info2()
+                    + " [" + now.Status + "]");
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("Press enter to go back...");
+                Console.ReadLine();
+                break;
+
+            case "5":
+                Console.WriteLine("Accept or deny a trade");
+                List<Trade> AcceptDeny = new List<Trade>();
+
+                foreach (Trade acceptdenytrade in trades)
+                {
+                    if (acceptdenytrade.To == active_user && acceptdenytrade.Status == Trade.TradingStatus.Pending)
+                    {
+                        AcceptDeny.Add(acceptdenytrade);
+                    }
+                }
+                if (AcceptDeny.Count == 0)
+                {
+                    Console.WriteLine("No request for now");
+                    break;
+                }
+                for (int i = 0; i < AcceptDeny.Count; ++i)
+                {
+                    Trade now = AcceptDeny[i];
+                    Console.WriteLine(i + 1 + ". From " + now.To.Email + " -> " + now.From.Email + " item: " + now.Item.Info2() + " [" + now.Status + "]");
+                    if (now.OfferedItem != null)
+                    {
+                        Console.WriteLine(" Offered item: " + now.OfferedItem.Info2());
+                    }
+                    else
+                    {
+                        Console.WriteLine("No request has been inserted");
+                    }
+                }
+
+                break;
 
 
 
-            case "7":
+            case "8":
                 active_user = null;
                 break;
             default:
