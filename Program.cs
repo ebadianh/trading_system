@@ -18,6 +18,10 @@ items.Add(new Item("Stol", "Grön färg, lite sliten.", testUser1));
 items.Add(new Item("iPhone 13 Pro Max", "Sprucken skärm.", testUser2));
 items.Add(new Item("Barnsäng", "90x90 i topp skick.", testUser3));
 
+testUser1.Items.Add(items[0]);
+testUser2.Items.Add(items[1]);
+testUser3.Items.Add(items[2]);
+
 List<Trade> trades = new List<Trade>();
 
 
@@ -99,16 +103,15 @@ while (running)
     }
     else
     {
-        Console.WriteLine("--- Welcome dear user ---");
+        Console.WriteLine("--- Welcome dear " + active_user.Email + " ---");
         Console.WriteLine();
         Console.WriteLine("1. Upload item");
         Console.WriteLine("2. Browse trough items");
         Console.WriteLine("3. Request a trade from another");
-        Console.WriteLine("4. Browse trade requests");
+        Console.WriteLine("4. See your sent trade requests");
         Console.WriteLine("5. Accept or deny a request");
         Console.WriteLine("6. Browse trough completed trades");
-        Console.WriteLine("7. See your sended requests");
-        Console.WriteLine("8. Logout");
+        Console.WriteLine("7. Logout");
 
         string Userinput = Console.ReadLine();
 
@@ -150,60 +153,89 @@ while (running)
 
 
             case "3":
-                Console.WriteLine("Pick a number from the list you would like to trade with");
+                Console.WriteLine("Choose a item you like to have");
                 for (int i = 0; i < items.Count; ++i) //loopar igenom items
                 {
                     Console.WriteLine(i + 1 + ": " + items[i].Info()); //skriver ut nummer med items
                 }
 
-                string ReqInput = Console.ReadLine();
+                string RequestInput = Console.ReadLine();
+                int RequestChoice;
 
-                if (!int.TryParse(ReqInput, out int choice)) // från text till heltal
+                if (!int.TryParse(RequestInput, out RequestChoice) || RequestChoice < 1 || RequestChoice > items.Count)  // från text till heltal
                 {
-                    Console.WriteLine("Write a number");
-                    break;
-                }
-                if (choice < 1 || choice > items.Count) // väljer en siffra som inte är med
-                {
-                    Console.WriteLine("Number doesnt exist");
-                    break;
-                }
-                Item chosenItem = items[choice - 1];
-
-                if (chosenItem.Owner == active_user) //om du väljer ditt egna item
-                {
-                    Console.WriteLine("Your own");
+                    Console.WriteLine("Invalid choice");
                     break;
                 }
 
-                Trade newTrade = new Trade(active_user, chosenItem.Owner, chosenItem);
-                newTrade.OfferedItem = chosenItem;
+                Item requesteditem = items[RequestChoice - 1];
+
+                if (requesteditem.Owner == active_user) //om du väljer ditt egna item
+                {
+                    Console.WriteLine("Sorry, your own item");
+                    break;
+                }
+
+                if (active_user.Items.Count == 0)
+                {
+                    Console.WriteLine("You have no items to offer");
+                }
+
+
+                Console.WriteLine("Now choose one of your own items you like to offer");
+                for (int i = 0; i < active_user.Items.Count; ++i)
+                {
+                    Console.WriteLine((i + 1) + ": " + active_user.Items[i].Info2());
+                }
+                string offerInput = Console.ReadLine();
+                int offerChoice;
+
+                if (!int.TryParse(offerInput, out offerChoice) || offerChoice < 1 || offerChoice > active_user.Items.Count)
+                {
+                    Console.WriteLine("Invalid choice");
+                }
+
+                Item offereditem = active_user.Items[offerChoice - 1];
+
+                Trade newTrade = new Trade(active_user, requesteditem.Owner, requesteditem, offereditem);
                 trades.Add(newTrade); // skapar en ny trade i trade-listan
 
-                Console.WriteLine("Request sended");
+                Console.WriteLine("Request sent");
                 break;
 
             case "4":
-                Console.WriteLine("See your trade requests");
-                List<Trade> incomingTrades = new List<Trade>();
+                Console.WriteLine("See your sent trade requests");
+                List<Trade> sentTrades = new List<Trade>();
+
                 foreach (Trade trade in trades)
                 {
-                    if (trade.From == active_user && trade.Status == Trade.TradingStatus.Pending)
+                    if (trade.From.Email == active_user.Email && trade.Status == Trade.TradingStatus.Pending)
                     {
-                        incomingTrades.Add(trade);
+                        sentTrades.Add(trade);
                     }
                 }
-                if (incomingTrades.Count == 0)
+                if (sentTrades.Count == 0)
                 {
-                    Console.WriteLine("No requests for now");
+                    Console.WriteLine("You havent sent any request yet");
                     break;
                 }
-                for (int i = 0; i < incomingTrades.Count; ++i)
+                for (int i = 0; i < sentTrades.Count; ++i)
                 {
-                    Trade now = incomingTrades[i];
-                    Console.WriteLine((i + 1) + ". " + now.To.Email + " has send a request for your " + now.Item.Info2()
-                    // + "The senders item is: " + now.OfferedItem.Info2()
-                    + " [" + now.Status + "]");
+                    Trade trade = sentTrades[i];
+                    Console.WriteLine("--------------------------");
+                    Console.WriteLine("Request number: " + (i + 1));
+                    Console.WriteLine("To: " + trade.To.Email);
+                    Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
+
+                    if (trade.OfferedItem != null)
+                    {
+                        Console.WriteLine("You offered: " + trade.OfferedItem.Info2());
+                    }
+                    else
+                    {
+                        Console.WriteLine("No item offered");
+                    }
+                    Console.WriteLine("Status: " + trade.Status);
                 }
 
                 Console.WriteLine();
@@ -211,41 +243,41 @@ while (running)
                 Console.ReadLine();
                 break;
 
-            case "5":
-                Console.WriteLine("Accept or deny a trade");
-                List<Trade> AcceptDeny = new List<Trade>();
+            // case "5":
+            //     Console.WriteLine("Accept or deny a trade");
+            //     List<Trade> AcceptDeny = new List<Trade>();
 
-                foreach (Trade acceptdenytrade in trades)
-                {
-                    if (acceptdenytrade.To == active_user && acceptdenytrade.Status == Trade.TradingStatus.Pending)
-                    {
-                        AcceptDeny.Add(acceptdenytrade);
-                    }
-                }
-                if (AcceptDeny.Count == 0)
-                {
-                    Console.WriteLine("No request for now");
-                    break;
-                }
-                for (int i = 0; i < AcceptDeny.Count; ++i)
-                {
-                    Trade now = AcceptDeny[i];
-                    Console.WriteLine(i + 1 + ". From " + now.To.Email + " -> " + now.From.Email + " item: " + now.Item.Info2() + " [" + now.Status + "]");
-                    if (now.OfferedItem != null)
-                    {
-                        Console.WriteLine(" Offered item: " + now.OfferedItem.Info2());
-                    }
-                    else
-                    {
-                        Console.WriteLine("No request has been inserted");
-                    }
-                }
+            //     foreach (Trade acceptdenytrade in trades)
+            //     {
+            //         if (acceptdenytrade.To == active_user && acceptdenytrade.Status == Trade.TradingStatus.Pending)
+            //         {
+            //             AcceptDeny.Add(acceptdenytrade);
+            //         }
+            //     }
+            //     if (AcceptDeny.Count == 0)
+            //     {
+            //         Console.WriteLine("No request for now");
+            //         break;
+            //     }
+            //     for (int i = 0; i < AcceptDeny.Count; ++i)
+            //     {
+            //         Trade now = AcceptDeny[i];
+            //         Console.WriteLine(i + 1 + ". From " + now.To.Email + " -> " + now.From.Email + " item: " + now.Item.Info2() + " [" + now.Status + "]");
+            //         if (now.OfferedItem != null)
+            //         {
+            //             Console.WriteLine(" Offered item: " + now.OfferedItem.Info2());
+            //         }
+            //         else
+            //         {
+            //             Console.WriteLine("No request has been inserted");
+            //         }
+            //     }
 
-                break;
+            //     break;
 
 
 
-            case "8":
+            case "7":
                 active_user = null;
                 break;
             default:

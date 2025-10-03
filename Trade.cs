@@ -4,16 +4,16 @@ namespace TradingApp;
 
 class Trade
 {
-    public User To;
     public User From;
+    public User To;
     public Item RequestedItem;
     public Item OfferedItem;
     public TradingStatus Status;
 
-    public Trade(User to, User from, Item requesteditem, Item offereditem)
+    public Trade(User from, User to, Item requesteditem, Item offereditem)
     {
-        To = to;
         From = from;
+        To = to;
         RequestedItem = requesteditem;
         OfferedItem = offereditem;
         Status = TradingStatus.Pending;
