@@ -1,4 +1,5 @@
-﻿using System.Reflection.Metadata;
+﻿using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using Microsoft.VisualBasic;
 using TradingApp;
 
@@ -149,6 +150,10 @@ while (running)
                 {
                     Console.WriteLine(item.Info());
                 }
+
+                Console.WriteLine();
+                Console.WriteLine("Press enter to go back...");
+                Console.ReadLine();
                 break;
 
 
@@ -179,6 +184,7 @@ while (running)
                 if (active_user.Items.Count == 0)
                 {
                     Console.WriteLine("You have no items to offer");
+                    break;
                 }
 
 
@@ -243,37 +249,66 @@ while (running)
                 Console.ReadLine();
                 break;
 
-            // case "5":
-            //     Console.WriteLine("Accept or deny a trade");
-            //     List<Trade> AcceptDeny = new List<Trade>();
+            case "5":
+                Console.WriteLine("List of trades waiting for decision");
+                List<Trade> tradesinPending = new List<Trade>();
+                foreach (Trade trade in trades)
+                {
+                    if (trade.To.Email == active_user.Email && trade.Status == Trade.TradingStatus.Pending)
+                    {
+                        tradesinPending.Add(trade);
+                    }
+                }
+                if (tradesinPending.Count == 0)
+                {
+                    Console.WriteLine("You have no trades waiting for decision");
+                    break;
+                }
 
-            //     foreach (Trade acceptdenytrade in trades)
-            //     {
-            //         if (acceptdenytrade.To == active_user && acceptdenytrade.Status == Trade.TradingStatus.Pending)
-            //         {
-            //             AcceptDeny.Add(acceptdenytrade);
-            //         }
-            //     }
-            //     if (AcceptDeny.Count == 0)
-            //     {
-            //         Console.WriteLine("No request for now");
-            //         break;
-            //     }
-            //     for (int i = 0; i < AcceptDeny.Count; ++i)
-            //     {
-            //         Trade now = AcceptDeny[i];
-            //         Console.WriteLine(i + 1 + ". From " + now.To.Email + " -> " + now.From.Email + " item: " + now.Item.Info2() + " [" + now.Status + "]");
-            //         if (now.OfferedItem != null)
-            //         {
-            //             Console.WriteLine(" Offered item: " + now.OfferedItem.Info2());
-            //         }
-            //         else
-            //         {
-            //             Console.WriteLine("No request has been inserted");
-            //         }
-            //     }
+                for (int i = 0; i < tradesinPending.Count; ++i)
+                {
+                    Trade trade = tradesinPending[i];
+                    Console.WriteLine("-------------------");
+                    Console.WriteLine("Request number: " + (i + 1));
+                    Console.WriteLine("From: " + trade.From.Email);
+                    Console.WriteLine("They want: " + trade.RequestedItem.Info2());
+                    Console.WriteLine("They offer: " + trade.OfferedItem.Info2());
+                    Console.WriteLine("Status: " + trade.Status);
+                }
 
-            //     break;
+
+                Console.WriteLine("-------------------");
+                Console.WriteLine("Enter the number of the request you want to respond to: ");
+
+                string responseInput = Console.ReadLine();
+                int responseChoice;
+
+                if (!int.TryParse(responseInput, out responseChoice) || responseChoice < 1 || responseChoice > tradesinPending.Count)
+                {
+                    Console.WriteLine("Invalid choice");
+                    break;
+                }
+
+                Trade selectedTrade = tradesinPending[responseChoice - 1];
+
+                Console.WriteLine("Enter y for yes or n for no");
+                string decision = Console.ReadLine();
+
+                if (decision == "y" || decision == "Y")
+                {
+                    Console.WriteLine("Trade has been accepted");
+                }
+                else if (decision == "n" || decision == "N")
+                {
+                    Console.WriteLine("Trade has been denied");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input. Trade remains pending");
+                }
+                break;
+
+
 
 
 
