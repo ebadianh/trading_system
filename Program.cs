@@ -44,7 +44,7 @@ while (running)
         Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.WriteLine("3. Exit");
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.Write("Please choose where you want to go: ");
+        Console.Write("Please choose your option: ");
         Console.ResetColor();
 
         string menuinput = Console.ReadLine();
@@ -104,17 +104,25 @@ while (running)
     }
     else
     {
+        int waiting = 0;
+        foreach (Trade trade in trades)
+        {
+            if (trade.To.Email == active_user.Email && trade.Status == Trade.TradingStatus.Pending)
+            {
+                waiting++;
+            }
+        }
         Console.WriteLine("═════╡ Welcome dear " + active_user.Email + " ╞═════");
-        Console.WriteLine();
+        Console.WriteLine("══════════════════════════════════");
         Console.WriteLine("1. Upload an item");
-        Console.WriteLine("2. Browse trough all the items");
+        Console.WriteLine("2. Browse through all items");
         Console.WriteLine("3. Send a request for another user's item");
         Console.WriteLine("4. See your sent trade requests");
-        Console.WriteLine("5. Accept or deny a request");
-        Console.WriteLine("6. Browse trough completed trades");
+        Console.WriteLine("5. Accept or deny a request (" + waiting + ")");
+        Console.WriteLine("6. Browse through completed trades");
         Console.WriteLine("7. Logout");
         Console.WriteLine("8. Exit");
-        Console.WriteLine();
+        Console.Write("Please choose your option: ");
 
         string Userinput = Console.ReadLine();
 
@@ -126,7 +134,7 @@ while (running)
 
                 if (ItemName == "")
                 {
-                    Console.WriteLine("Unvalid insert. please try again");
+                    Console.WriteLine("Invalid input, please try again");
                     break;
                 }
                 Console.WriteLine("Give a short description of your item");
@@ -134,20 +142,19 @@ while (running)
 
                 if (ItemDesc == "")
                 {
-                    Console.WriteLine("Unvalid insert, please try again");
+                    Console.WriteLine("Invalid input, please try again");
                     break;
                 }
                 Item newItem = new Item(ItemName, ItemDesc, active_user);
                 items.Add(newItem);
                 active_user.Items.Add(newItem);
 
-                Console.WriteLine("Item uploaded");
-                Console.WriteLine("");
-                Console.WriteLine("");
+                Console.WriteLine("Item has been successfully uploaded");
+                Console.WriteLine();
                 break;
 
             case "2":
-                Console.WriteLine("--- All the uploaded items ---");
+                Console.WriteLine("═════╡ All the uploaded items ╞═════");
                 foreach (Item item in items)
                 {
                     Console.WriteLine(item.Info());
@@ -160,7 +167,7 @@ while (running)
 
 
             case "3":
-                Console.WriteLine("Choose a item you like to have");
+                Console.WriteLine("═════╡ Choose an item you like to trade for ╞═════");
                 for (int i = 0; i < items.Count; ++i) //loopar igenom items
                 {
                     Console.WriteLine(i + 1 + ": " + items[i].Info()); //skriver ut nummer med items
@@ -179,7 +186,7 @@ while (running)
 
                 if (requesteditem.Owner == active_user) //om du väljer ditt egna item
                 {
-                    Console.WriteLine("Sorry, your own item");
+                    Console.WriteLine("Sorry, you can't choose your own item");
                     break;
                 }
 
@@ -208,11 +215,11 @@ while (running)
                 Trade newTrade = new Trade(active_user, requesteditem.Owner, requesteditem, offereditem);
                 trades.Add(newTrade); // skapar en ny trade i trade-listan
 
-                Console.WriteLine("Request sent");
+                Console.WriteLine("Request has been sent");
                 break;
 
             case "4":
-                Console.WriteLine("See your sent trade requests");
+                Console.WriteLine("═════╡ See your sent trade requests ╞═════");
                 List<Trade> sentTrades = new List<Trade>();
 
                 foreach (Trade trade in trades)
@@ -224,13 +231,14 @@ while (running)
                 }
                 if (sentTrades.Count == 0)
                 {
-                    Console.WriteLine("You havent sent any request yet");
+                    Console.WriteLine("You haven't sent any requests yet");
+                    Console.WriteLine();
                     break;
                 }
                 for (int i = 0; i < sentTrades.Count; ++i)
                 {
                     Trade trade = sentTrades[i];
-                    Console.WriteLine("--------------------------");
+                    Console.WriteLine("═══════════════════════════════════════════");
                     Console.WriteLine("Request number: " + (i + 1));
                     Console.WriteLine("To: " + trade.To.Email);
                     Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
@@ -241,7 +249,8 @@ while (running)
                     }
                     else
                     {
-                        Console.WriteLine("No item offered");
+                        Console.WriteLine("No item has been offered");
+                        Console.WriteLine();
                     }
                     Console.WriteLine("Status: " + trade.Status);
                 }
@@ -252,7 +261,7 @@ while (running)
                 break;
 
             case "5":
-                Console.WriteLine("List of trades waiting for decision");
+                Console.WriteLine("═════╡ List of trades waiting for a decision ╞═════");
                 List<Trade> tradesinPending = new List<Trade>();
                 foreach (Trade trade in trades)
                 {
@@ -270,17 +279,17 @@ while (running)
                 for (int i = 0; i < tradesinPending.Count; ++i)
                 {
                     Trade trade = tradesinPending[i];
-                    Console.WriteLine("-------------------");
+                    Console.WriteLine("═══════════════════════════════════");
                     Console.WriteLine("Request number: " + (i + 1));
                     Console.WriteLine("From: " + trade.From.Email);
-                    Console.WriteLine("They want: " + trade.RequestedItem.Info2());
-                    Console.WriteLine("They offer: " + trade.OfferedItem.Info2());
+                    Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
+                    Console.WriteLine("Offered item: " + trade.OfferedItem.Info2());
                     Console.WriteLine("Status: " + trade.Status);
                 }
 
 
-                Console.WriteLine("-------------------");
-                Console.WriteLine("Enter the number of the request you want to respond to: ");
+                Console.WriteLine("═══════════════════════════════════");
+                Console.WriteLine("Enter the number of the request you want to respond to:");
 
                 string responseInput = Console.ReadLine();
                 int responseChoice;
@@ -293,7 +302,7 @@ while (running)
 
                 Trade selectedTrade = tradesinPending[responseChoice - 1];
 
-                Console.WriteLine("Enter y for yes or n for no");
+                Console.WriteLine("Please make your choice (y = yes, n = no)");
                 string decision = Console.ReadLine();
 
                 if (decision == "y" || decision == "Y")
@@ -321,7 +330,7 @@ while (running)
                 break;
 
             case "6":
-                Console.WriteLine("All of the completed trades");
+                Console.WriteLine("═════╡ All of the completed trades ╞═════");
                 List<Trade> completedTrades = new List<Trade>();
                 foreach (Trade trade in trades)
                 {
@@ -340,11 +349,11 @@ while (running)
                 for (int i = 0; i < completedTrades.Count; ++i)
                 {
                     Trade trade = completedTrades[i];
-                    Console.WriteLine("---------------------");
+                    Console.WriteLine("═══════════════════════════════════");
                     Console.WriteLine("Trade number: " + (i + 1));
                     Console.WriteLine("From: " + trade.From.Email);
                     Console.WriteLine("To: " + trade.To.Email);
-                    Console.WriteLine("Request item: " + trade.RequestedItem.Info2());
+                    Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
                     Console.WriteLine("Offered item: " + trade.OfferedItem.Info2());
                     Console.WriteLine("Status: " + Trade.TradingStatus.Completed);
                 }
@@ -363,7 +372,7 @@ while (running)
                 break;
 
             default:
-                Console.WriteLine("Unvalid insert, try again");
+                Console.WriteLine("Invalid insert, please try again");
                 break;
         }
     }

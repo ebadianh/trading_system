@@ -19,7 +19,7 @@ class Item
 
     public string Info()
     {
-        return Owner.Email + ": " + ItemName + " " + Description;
+        return Owner.Email + ": " + ItemName + " - " + Description;
     }
 
     public string Info2()
