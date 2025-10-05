@@ -14,6 +14,7 @@ users.Add(testUser1);
 users.Add(testUser2);
 users.Add(testUser3);
 
+
 List<Item> items = new List<Item>();
 items.Add(new Item("Stol", "Grön färg, lite sliten.", testUser1));
 items.Add(new Item("iPhone 13 Pro Max", "Sprucken skärm.", testUser2));
@@ -372,7 +373,7 @@ while (running)
                 break;
 
             default:
-                Console.WriteLine("Invalid insert, please try again");
+                Console.WriteLine("Invalid input, please try again");
                 break;
         }
     }
