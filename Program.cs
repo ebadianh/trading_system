@@ -35,26 +35,26 @@ while (running)
     if (active_user == null)
     {
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine("--- Welcome to the trading market ---");
+        Console.WriteLine("═════╡ Welcome to the trading market ╞═════");
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.DarkBlue;
-        Console.WriteLine("Please choose where you want to go");
+        Console.WriteLine("1. Create an account");
         Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine("1. I'm new and would like to have an account");
-        Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.WriteLine("2. Login");
-        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.ForegroundColor = ConsoleColor.DarkBlue;
         Console.WriteLine("3. Exit");
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.Write("Please choose where you want to go: ");
         Console.ResetColor();
 
         string menuinput = Console.ReadLine();
         switch (menuinput)
         {
             case "1":
-                Console.WriteLine("Please choose your username");
+                Console.WriteLine("Enter your username:");
                 string newUsername = Console.ReadLine();
 
-                Console.WriteLine("And enter your password");
+                Console.WriteLine("And your password:");
                 string newPassword = Console.ReadLine();
 
                 bool exist = false;
@@ -68,22 +68,22 @@ while (running)
                 }
                 if (exist)
                 {
-                    Console.WriteLine("Username is already taken");
+                    Console.WriteLine("Username is already taken.");
                 }
                 else
                 {
                     users.Add(new User(newUsername, newPassword));
-                    Console.WriteLine("Added");
+                    Console.WriteLine("The account has been created!");
                 }
                 break;
 
             case "2":
                 if (active_user == null)
                 {
-                    Console.WriteLine("Username: ");
+                    Console.WriteLine("Username:");
                     string username = Console.ReadLine();
 
-                    Console.WriteLine("Password: ");
+                    Console.WriteLine("Password:");
                     string password = Console.ReadLine();
 
                     foreach (User user in users)
@@ -104,15 +104,17 @@ while (running)
     }
     else
     {
-        Console.WriteLine("--- Welcome dear " + active_user.Email + " ---");
+        Console.WriteLine("═════╡ Welcome dear " + active_user.Email + " ╞═════");
         Console.WriteLine();
-        Console.WriteLine("1. Upload item");
-        Console.WriteLine("2. Browse trough items");
-        Console.WriteLine("3. Request a trade from another");
+        Console.WriteLine("1. Upload an item");
+        Console.WriteLine("2. Browse trough all the items");
+        Console.WriteLine("3. Send a request for another user's item");
         Console.WriteLine("4. See your sent trade requests");
         Console.WriteLine("5. Accept or deny a request");
         Console.WriteLine("6. Browse trough completed trades");
         Console.WriteLine("7. Logout");
+        Console.WriteLine("8. Exit");
+        Console.WriteLine();
 
         string Userinput = Console.ReadLine();
 
@@ -261,7 +263,7 @@ while (running)
                 }
                 if (tradesinPending.Count == 0)
                 {
-                    Console.WriteLine("You have no trades waiting for decision");
+                    Console.WriteLine("You have no trades waiting for a decision");
                     break;
                 }
 
@@ -296,10 +298,20 @@ while (running)
 
                 if (decision == "y" || decision == "Y")
                 {
+                    selectedTrade.RequestedItem.Owner.Items.Remove(selectedTrade.RequestedItem);
+                    selectedTrade.From.Items.Add(selectedTrade.RequestedItem);
+                    selectedTrade.RequestedItem.Owner = selectedTrade.From;
+
+                    selectedTrade.From.Items.Remove(selectedTrade.OfferedItem);
+                    active_user.Items.Add(selectedTrade.OfferedItem);
+                    selectedTrade.OfferedItem.Owner = active_user;
+
+                    selectedTrade.Status = Trade.TradingStatus.Accepted;
                     Console.WriteLine("Trade has been accepted");
                 }
                 else if (decision == "n" || decision == "N")
                 {
+                    selectedTrade.Status = Trade.TradingStatus.Denied;
                     Console.WriteLine("Trade has been denied");
                 }
                 else
@@ -308,13 +320,48 @@ while (running)
                 }
                 break;
 
+            case "6":
+                Console.WriteLine("All of the completed trades");
+                List<Trade> completedTrades = new List<Trade>();
+                foreach (Trade trade in trades)
+                {
+                    if (trade.Status == Trade.TradingStatus.Accepted || trade.Status == Trade.TradingStatus.Denied)
+                    {
+                        completedTrades.Add(trade);
+                    }
+                }
 
+                if (completedTrades.Count == 0)
+                {
+                    Console.WriteLine("No trades have been completed yet");
+                    break;
+                }
 
+                for (int i = 0; i < completedTrades.Count; ++i)
+                {
+                    Trade trade = completedTrades[i];
+                    Console.WriteLine("---------------------");
+                    Console.WriteLine("Trade number: " + (i + 1));
+                    Console.WriteLine("From: " + trade.From.Email);
+                    Console.WriteLine("To: " + trade.To.Email);
+                    Console.WriteLine("Request item: " + trade.RequestedItem.Info2());
+                    Console.WriteLine("Offered item: " + trade.OfferedItem.Info2());
+                    Console.WriteLine("Status: " + Trade.TradingStatus.Completed);
+                }
 
+                Console.WriteLine();
+                Console.WriteLine("Press enter to go back...");
+                Console.ReadLine();
+                break;
 
             case "7":
                 active_user = null;
                 break;
+
+            case "8":
+                running = false;
+                break;
+
             default:
                 Console.WriteLine("Unvalid insert, try again");
                 break;

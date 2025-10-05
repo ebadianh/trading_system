@@ -19,12 +19,6 @@ class Trade
         Status = TradingStatus.Pending;
     }
 
-    public string Info3()
-    {
-        return To.Items + " -> " + From.Items;
-    }
-
-
     public enum TradingStatus
     {
         None,
