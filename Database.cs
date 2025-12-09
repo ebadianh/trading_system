@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using Mysqlx.Connection;
 using TradingApp;
 
 class Database
@@ -16,6 +17,8 @@ class Database
             sqlcmd.Parameters.AddWithValue("@email", user.Email);
             sqlcmd.Parameters.AddWithValue("@user_password", user.User_Password);
             sqlcmd.ExecuteNonQuery();
+
+            try { user.UserID = (int)sqlcmd.LastInsertedId; } catch { }
 
             Console.WriteLine("Användare sparad i databasen!");
         }
@@ -38,8 +41,12 @@ class Database
 
             if (reader.Read())
             {
-                var user = new User(reader["email"].ToString() ?? "", reader["user_password"].ToString() ?? "");
-                user.UserID = Convert.ToInt32(reader["UserID"]);
+                var user = new User(reader["Email"].ToString() ?? "", reader["User_Password"].ToString() ?? "")
+                {
+                    UserID = Convert.ToInt32(reader["UserID"])
+                };
+                user.Items = GetItemsByUser(user);
+                return user;
             }
         }
         catch (Exception error)
@@ -62,6 +69,8 @@ class Database
             sqlcmd.Parameters.AddWithValue("@desc", item.Description);
             sqlcmd.Parameters.AddWithValue("@ownerId", item.Owner.UserID);
             sqlcmd.ExecuteNonQuery();
+
+            try { item.ItemID = (int)sqlcmd.LastInsertedId; } catch { }
 
             Console.WriteLine("Item sparad i databasen!");
         }
@@ -249,6 +258,22 @@ class Database
         }
     }
 
-
+    public void UpdateItemOwner(int itemId, int newOwnerId)
+    {
+        using var connection = new MySqlConnection(db);
+        try
+        {
+            connection.Open();
+            string query = "UPDATE items SET OwnerID = @ownerId WHERE ItemID = @itemId";
+            using var sqlcmd = new MySqlCommand(query, connection);
+            sqlcmd.Parameters.AddWithValue("@ownerId", newOwnerId);
+            sqlcmd.Parameters.AddWithValue("@itemId", itemId);
+            sqlcmd.ExecuteNonQuery();
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine("Fel vid uppdatering av item-owner: " + error.Message);
+        }
+    }
 
 }

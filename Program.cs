@@ -1,5 +1,4 @@
-﻿
-using TradingApp;
+﻿using TradingApp;
 using MySql.Data.MySqlClient;
 
 
@@ -42,7 +41,6 @@ while (running)
                 Console.WriteLine("And your password:");
                 string? newPassword = Console.ReadLine();
 
-
                 bool exist = false;
                 foreach (User user in users)
                 {
@@ -76,11 +74,11 @@ while (running)
                     Console.WriteLine("Password:");
                     string? password = Console.ReadLine();
 
-                    User? loggedinUser = db.LoginUser(username ?? "", password ?? "");
+                    var user = db.LoginUser(username ?? "", password ?? "");
 
-                    if (loggedinUser != null)
+                    if (user != null)
                     {
-                        active_user = loggedinUser;
+                        active_user = user;
                     }
                     else
                     {
@@ -142,9 +140,12 @@ while (running)
                 items.Add(newItem);
                 active_user.Items.Add(newItem);
 
+                db.SaveItem(newItem);
 
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Item has been successfully uploaded");
                 Console.WriteLine();
+                Console.ResetColor();
                 break;
 
             case "2":
@@ -250,9 +251,9 @@ while (running)
                     Item offereditem = active_user.Items[offerChoice - 1];
 
                     Trade newTrade = new Trade(active_user, requesteditem.Owner, requesteditem, offereditem);
+                    trades.Add(newTrade);
 
                     db.SaveTrade(newTrade);
-                    trades.Add(newTrade);
 
                     Console.WriteLine("Request has been sent");
                     break;
