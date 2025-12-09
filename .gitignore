@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+.vscode/
+*.dll
+*.exe
+*.pdb
+*.user
+appsettings.json
+.DS_Store
