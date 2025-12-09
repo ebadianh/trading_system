@@ -4,6 +4,7 @@ namespace TradingApp;
 
 class Item
 {
+    public int ItemID;
     public string ItemName;
     public string Description;
     public User Owner;
@@ -26,5 +27,4 @@ class Item
     {
         return ItemName + " " + Description;
     }
-
 }

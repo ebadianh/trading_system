@@ -2,15 +2,16 @@ namespace TradingApp;
 
 class User
 {
+    public int UserID;
     public string Email;
-    private string _password;
+    public string User_Password;
     public List<Item> Items;
 
 
     public User(string email, string password)
     {
         Email = email;
-        _password = password;
+        User_Password = password;
         Items = new List<Item>();
     }
 
@@ -18,14 +19,11 @@ class User
 
     public bool TryLogin(string username, string password)
     {
-        return username == Email && password == _password;
+        return username == Email && password == User_Password;
     }
 
     public string NewUser()
     {
         return Email;
     }
-
-
-
 }

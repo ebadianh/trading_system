@@ -1,19 +1,24 @@
-﻿using System.Linq.Expressions;
+﻿using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection.Metadata;
 using Microsoft.VisualBasic;
-using TradingApp;
 
-User? active_user = null;
+using TradingApp;
+using MySql.Data.MySqlClient;
+
+
+
 
 List<User> users = new List<User>();
-
 List<Item> items = new List<Item>();
-
 List<Trade> trades = new List<Trade>();
 
 
+User? active_user = null;
+
 Console.Clear();
 
+Database db = new Database();
 
 bool running = true;
 while (running)
@@ -33,15 +38,16 @@ while (running)
         Console.Write("Please choose your option: ");
         Console.ResetColor();
 
-        string menuinput = Console.ReadLine();
+        string? menuinput = Console.ReadLine();
         switch (menuinput)
         {
             case "1":
                 Console.WriteLine("Enter your username:");
-                string newUsername = Console.ReadLine();
+                string? newUsername = Console.ReadLine();
 
                 Console.WriteLine("And your password:");
-                string newPassword = Console.ReadLine();
+                string? newPassword = Console.ReadLine();
+
 
                 bool exist = false;
                 foreach (User user in users)
@@ -58,8 +64,12 @@ while (running)
                 }
                 else
                 {
-                    users.Add(new User(newUsername, newPassword));
-                    Console.WriteLine("The account has been created!");
+                    User newUser = new User(newUsername ?? "", newPassword ?? "");
+                    users.Add(newUser);
+
+                    db.SaveUser(newUser);
+
+                    Console.WriteLine("Your account has been created!");
                 }
                 break;
 
@@ -67,18 +77,20 @@ while (running)
                 if (active_user == null)
                 {
                     Console.WriteLine("Username:");
-                    string username = Console.ReadLine();
+                    string? username = Console.ReadLine();
 
                     Console.WriteLine("Password:");
-                    string password = Console.ReadLine();
+                    string? password = Console.ReadLine();
 
-                    foreach (User user in users)
+                    User? loggedinUser = db.LoginUser(username ?? "", password ?? "");
+
+                    if (loggedinUser != null)
                     {
-                        if (user.TryLogin(username, password))
-                        {
-                            active_user = user;
-                            break;
-                        }
+                        active_user = loggedinUser;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Login failed. Incorrect username or password.");
                     }
                 }
                 break;
@@ -102,21 +114,22 @@ while (running)
         Console.WriteLine("══════════════════════════════════");
         Console.WriteLine("1. Upload an item");
         Console.WriteLine("2. Browse through all items");
-        Console.WriteLine("3. Send a request for another user's item");
-        Console.WriteLine("4. See your sent trade requests");
-        Console.WriteLine("5. Accept or deny a request (" + waiting + ")");
-        Console.WriteLine("6. Browse through completed trades");
-        Console.WriteLine("7. Logout");
-        Console.WriteLine("8. Exit");
+        Console.WriteLine("3. Browse through your items");
+        Console.WriteLine("4. Send a request for another user's item");
+        Console.WriteLine("5. See your sent trade requests");
+        Console.WriteLine("6. Accept or deny a request (" + waiting + ")");
+        Console.WriteLine("7. Browse through completed trades");
+        Console.WriteLine("8. Logout");
+        Console.WriteLine("9. Exit");
         Console.Write("Please choose your option: ");
 
-        string Userinput = Console.ReadLine();
+        string Userinput = Console.ReadLine() ?? "";
 
         switch (Userinput)
         {
             case "1":
                 Console.WriteLine("Insert the name of your item");
-                string ItemName = Console.ReadLine();
+                string ItemName = Console.ReadLine() ?? "";
 
                 if (ItemName == "")
                 {
@@ -124,7 +137,7 @@ while (running)
                     break;
                 }
                 Console.WriteLine("Give a short description of your item");
-                string ItemDesc = Console.ReadLine();
+                string ItemDesc = Console.ReadLine() ?? "";
 
                 if (ItemDesc == "")
                 {
@@ -135,15 +148,48 @@ while (running)
                 items.Add(newItem);
                 active_user.Items.Add(newItem);
 
+
                 Console.WriteLine("Item has been successfully uploaded");
                 Console.WriteLine();
                 break;
 
             case "2":
                 Console.WriteLine("═════╡ All the uploaded items ╞═════");
-                foreach (Item item in items)
+
+                var allItems = db.GetAllItems();
+
+                if (allItems.Count == 0)
                 {
-                    Console.WriteLine(item.Info());
+                    Console.WriteLine("No items have been uploaded yet.");
+                }
+                else
+                {
+                    foreach (Item item in allItems)
+                    {
+                        Console.WriteLine(item.Info());
+                    }
+
+                    Console.WriteLine();
+                    Console.WriteLine("Press enter to go back...");
+                    Console.ReadLine();
+                }
+                break;
+
+            case "3":
+                Console.WriteLine("═════╡ Your uploaded items ╞═════");
+
+                var userItems = db.GetItemsByUser(active_user);
+
+                if (userItems.Count == 0)
+                {
+                    Console.WriteLine("You haven't uploaded any items yet.");
+                }
+                else
+                {
+                    foreach (Item item in userItems)
+                    {
+                        Console.WriteLine(item.Info());
+                    }
                 }
 
                 Console.WriteLine();
@@ -152,25 +198,32 @@ while (running)
                 break;
 
 
-            case "3":
+            case "4":
                 Console.WriteLine("═════╡ Choose an item you like to trade for ╞═════");
-                for (int i = 0; i < items.Count; ++i) //loopar igenom items
+
+                var allItems = db.GetAllItems();
+
+                if (allItems.Count == 0)
                 {
-                    Console.WriteLine(i + 1 + ": " + items[i].Info()); //skriver ut nummer med items
+                    Console.WriteLine("No items are available for trading");
                 }
 
-                string RequestInput = Console.ReadLine();
-                int RequestChoice;
+                for (int i = 0; i < allItems.Count; ++i)
+                {
+                    Console.WriteLine(i + 1 + ": " + allItems[i].Info());
+                }
 
-                if (!int.TryParse(RequestInput, out RequestChoice) || RequestChoice < 1 || RequestChoice > items.Count)  // från text till heltal
+                string RequestInput = Console.ReadLine() ?? "";
+
+                if (!int.TryParse(RequestInput, out int RequestChoice) || RequestChoice < 1 || RequestChoice > allItems.Count)  // från text till heltal
                 {
                     Console.WriteLine("Invalid choice");
                     break;
                 }
 
-                Item requesteditem = items[RequestChoice - 1];
+                Item requesteditem = allItems[RequestChoice - 1];
 
-                if (requesteditem.Owner == active_user) //om du väljer ditt egna item
+                if (requesteditem.Owner.UserID == active_user.UserID)
                 {
                     Console.WriteLine("Sorry, you can't choose your own item");
                     break;
@@ -188,10 +241,9 @@ while (running)
                 {
                     Console.WriteLine((i + 1) + ": " + active_user.Items[i].Info2());
                 }
-                string offerInput = Console.ReadLine();
-                int offerChoice;
 
-                if (!int.TryParse(offerInput, out offerChoice) || offerChoice < 1 || offerChoice > active_user.Items.Count)
+                string offerInput = Console.ReadLine() ?? "";
+                if (!int.TryParse(offerInput, out int offerChoice) || offerChoice < 1 || offerChoice > active_user.Items.Count)
                 {
                     Console.WriteLine("Invalid choice");
                 }
@@ -204,7 +256,7 @@ while (running)
                 Console.WriteLine("Request has been sent");
                 break;
 
-            case "4":
+            case "5":
                 Console.WriteLine("═════╡ See your sent trade requests ╞═════");
                 List<Trade> sentTrades = new List<Trade>();
 
@@ -246,7 +298,7 @@ while (running)
                 Console.ReadLine();
                 break;
 
-            case "5":
+            case "6":
                 Console.WriteLine("═════╡ List of trades waiting for a decision ╞═════");
                 List<Trade> tradesinPending = new List<Trade>();
                 foreach (Trade trade in trades)
@@ -277,7 +329,7 @@ while (running)
                 Console.WriteLine("═══════════════════════════════════");
                 Console.WriteLine("Enter the number of the request you want to respond to:");
 
-                string responseInput = Console.ReadLine();
+                string responseInput = Console.ReadLine() ?? "";
                 int responseChoice;
 
                 if (!int.TryParse(responseInput, out responseChoice) || responseChoice < 1 || responseChoice > tradesinPending.Count)
@@ -289,7 +341,7 @@ while (running)
                 Trade selectedTrade = tradesinPending[responseChoice - 1];
 
                 Console.WriteLine("Please make your choice (y = yes, n = no)");
-                string decision = Console.ReadLine();
+                string decision = Console.ReadLine() ?? "";
 
                 if (decision == "y" || decision == "Y")
                 {
@@ -315,7 +367,7 @@ while (running)
                 }
                 break;
 
-            case "6":
+            case "7":
                 Console.WriteLine("═════╡ All of the completed trades ╞═════");
                 List<Trade> completedTrades = new List<Trade>();
                 foreach (Trade trade in trades)
@@ -349,11 +401,11 @@ while (running)
                 Console.ReadLine();
                 break;
 
-            case "7":
+            case "8":
                 active_user = null;
                 break;
 
-            case "8":
+            case "9":
                 running = false;
                 break;
 
