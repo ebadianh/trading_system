@@ -1,12 +1,6 @@
-﻿using System.Diagnostics;
-using System.Linq.Expressions;
-using System.Reflection.Metadata;
-using Microsoft.VisualBasic;
-
+﻿
 using TradingApp;
 using MySql.Data.MySqlClient;
-
-
 
 
 List<User> users = new List<User>();
@@ -154,26 +148,28 @@ while (running)
                 break;
 
             case "2":
-                Console.WriteLine("═════╡ All the uploaded items ╞═════");
-
-                var allItems = db.GetAllItems();
-
-                if (allItems.Count == 0)
                 {
-                    Console.WriteLine("No items have been uploaded yet.");
-                }
-                else
-                {
-                    foreach (Item item in allItems)
+                    Console.WriteLine("═════╡ All the uploaded items ╞═════");
+
+                    var allItems = db.GetAllItems();
+
+                    if (allItems.Count == 0)
                     {
-                        Console.WriteLine(item.Info());
+                        Console.WriteLine("No items have been uploaded yet.");
                     }
+                    else
+                    {
+                        foreach (Item item in allItems)
+                        {
+                            Console.WriteLine(item.Info());
+                        }
 
-                    Console.WriteLine();
-                    Console.WriteLine("Press enter to go back...");
-                    Console.ReadLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Press enter to go back...");
+                        Console.ReadLine();
+                    }
+                    break;
                 }
-                break;
 
             case "3":
                 Console.WriteLine("═════╡ Your uploaded items ╞═════");
@@ -199,62 +195,66 @@ while (running)
 
 
             case "4":
-                Console.WriteLine("═════╡ Choose an item you like to trade for ╞═════");
-
-                var allItems = db.GetAllItems();
-
-                if (allItems.Count == 0)
                 {
-                    Console.WriteLine("No items are available for trading");
-                }
+                    Console.WriteLine("═════╡ Choose an item you like to trade for ╞═════");
 
-                for (int i = 0; i < allItems.Count; ++i)
-                {
-                    Console.WriteLine(i + 1 + ": " + allItems[i].Info());
-                }
+                    var allItems = db.GetAllItems();
 
-                string RequestInput = Console.ReadLine() ?? "";
+                    if (allItems.Count == 0)
+                    {
+                        Console.WriteLine("No items are available for trading");
+                        break;
+                    }
 
-                if (!int.TryParse(RequestInput, out int RequestChoice) || RequestChoice < 1 || RequestChoice > allItems.Count)  // från text till heltal
-                {
-                    Console.WriteLine("Invalid choice");
+                    for (int i = 0; i < allItems.Count; ++i)
+                    {
+                        Console.WriteLine(i + 1 + ": " + allItems[i].Info());
+                    }
+
+                    string RequestInput = Console.ReadLine() ?? "";
+
+                    if (!int.TryParse(RequestInput, out int RequestChoice) || RequestChoice < 1 || RequestChoice > allItems.Count)  // från text till heltal
+                    {
+                        Console.WriteLine("Invalid choice");
+                        break;
+                    }
+
+                    Item requesteditem = allItems[RequestChoice - 1];
+
+                    if (requesteditem.Owner.UserID == active_user.UserID)
+                    {
+                        Console.WriteLine("Sorry, you can't choose your own item");
+                        break;
+                    }
+
+                    if (active_user.Items.Count == 0)
+                    {
+                        Console.WriteLine("You have no items to offer");
+                        break;
+                    }
+
+
+                    Console.WriteLine("Now choose one of your own items you like to offer");
+                    for (int i = 0; i < active_user.Items.Count; ++i)
+                    {
+                        Console.WriteLine((i + 1) + ": " + active_user.Items[i].Info2());
+                    }
+
+                    string offerInput = Console.ReadLine() ?? "";
+                    if (!int.TryParse(offerInput, out int offerChoice) || offerChoice < 1 || offerChoice > active_user.Items.Count)
+                    {
+                        Console.WriteLine("Invalid choice");
+                        break;
+                    }
+
+                    Item offereditem = active_user.Items[offerChoice - 1];
+
+                    Trade newTrade = new Trade(active_user, requesteditem.Owner, requesteditem, offereditem);
+                    trades.Add(newTrade);
+
+                    Console.WriteLine("Request has been sent");
                     break;
                 }
-
-                Item requesteditem = allItems[RequestChoice - 1];
-
-                if (requesteditem.Owner.UserID == active_user.UserID)
-                {
-                    Console.WriteLine("Sorry, you can't choose your own item");
-                    break;
-                }
-
-                if (active_user.Items.Count == 0)
-                {
-                    Console.WriteLine("You have no items to offer");
-                    break;
-                }
-
-
-                Console.WriteLine("Now choose one of your own items you like to offer");
-                for (int i = 0; i < active_user.Items.Count; ++i)
-                {
-                    Console.WriteLine((i + 1) + ": " + active_user.Items[i].Info2());
-                }
-
-                string offerInput = Console.ReadLine() ?? "";
-                if (!int.TryParse(offerInput, out int offerChoice) || offerChoice < 1 || offerChoice > active_user.Items.Count)
-                {
-                    Console.WriteLine("Invalid choice");
-                }
-
-                Item offereditem = active_user.Items[offerChoice - 1];
-
-                Trade newTrade = new Trade(active_user, requesteditem.Owner, requesteditem, offereditem);
-                trades.Add(newTrade); // skapar en ny trade i trade-listan
-
-                Console.WriteLine("Request has been sent");
-                break;
 
             case "5":
                 Console.WriteLine("═════╡ See your sent trade requests ╞═════");

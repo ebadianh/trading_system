@@ -12,10 +12,10 @@ class Database
         {
             connection.Open();
             string query = "INSERT INTO users (email, user_password) VALUES (@email, @user_password)";
-            MySqlCommand cmd = new MySqlCommand(query, connection);
-            cmd.Parameters.AddWithValue("@email", user.Email);
-            cmd.Parameters.AddWithValue("@user_password", user.User_Password);
-            cmd.ExecuteNonQuery();
+            MySqlCommand sqlcmd = new MySqlCommand(query, connection);
+            sqlcmd.Parameters.AddWithValue("@email", user.Email);
+            sqlcmd.Parameters.AddWithValue("@user_password", user.User_Password);
+            sqlcmd.ExecuteNonQuery();
 
             Console.WriteLine("Användare sparad i databasen!");
         }
@@ -142,5 +142,37 @@ class Database
 
         return items;
     }
+    public void SaveTrade(Trade trade)
+    {
+        using var connection = new MySqlConnection(db);
+        try
+        {
+            connection.Open();
+            string query = @"INSERT INTO trades 
+                         (FromUserID, ToUserID, RequestedItemID, OfferedItemID, Status)
+                         VALUES (@fromId, @toId, @requestedId, @offeredId, @status)";
+            using var sqlcmd = new MySqlCommand(query, connection);
+
+            sqlcmd.Parameters.AddWithValue("@fromId", trade.From.UserID);
+            sqlcmd.Parameters.AddWithValue("@toId", trade.To.UserID);
+            sqlcmd.Parameters.AddWithValue("@requestedId", trade.RequestedItem.ItemID);
+
+            if (trade.OfferedItem != null)
+                sqlcmd.Parameters.AddWithValue("@offeredId", trade.OfferedItem.ItemID);
+            else
+                sqlcmd.Parameters.AddWithValue("@offeredId", DBNull.Value);
+
+            sqlcmd.Parameters.AddWithValue("@status", trade.Status.ToString());
+
+            sqlcmd.ExecuteNonQuery();
+
+            trade.TradeID = (int)sqlcmd.LastInsertedId;
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine("Fel vid sparande av trade: " + error.Message);
+        }
+    }
+
 
 }
