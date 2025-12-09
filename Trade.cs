@@ -8,10 +8,10 @@ class Trade
     public User From;
     public User To;
     public Item RequestedItem;
-    public Item OfferedItem;
+    public Item? OfferedItem;
     public TradingStatus Status;
 
-    public Trade(User from, User to, Item requesteditem, Item offereditem)
+    public Trade(User from, User to, Item requesteditem, Item? offereditem)
     {
         From = from;
         To = to;
@@ -20,7 +20,7 @@ class Trade
         Status = TradingStatus.Pending;
     }
 
-    public Trade(int tradeid, User from, User to, Item requesteditem, Item offereditem, TradingStatus status)
+    public Trade(int tradeid, User from, User to, Item requesteditem, Item? offereditem, TradingStatus status)
     {
         TradeID = tradeid;
         From = from;

@@ -250,6 +250,8 @@ while (running)
                     Item offereditem = active_user.Items[offerChoice - 1];
 
                     Trade newTrade = new Trade(active_user, requesteditem.Owner, requesteditem, offereditem);
+
+                    db.SaveTrade(newTrade);
                     trades.Add(newTrade);
 
                     Console.WriteLine("Request has been sent");
@@ -258,15 +260,9 @@ while (running)
 
             case "5":
                 Console.WriteLine("═════╡ See your sent trade requests ╞═════");
-                List<Trade> sentTrades = new List<Trade>();
 
-                foreach (Trade trade in trades)
-                {
-                    if (trade.From.Email == active_user.Email && trade.Status == Trade.TradingStatus.Pending)
-                    {
-                        sentTrades.Add(trade);
-                    }
-                }
+                var sentTrades = new List<Trade>();
+
                 if (sentTrades.Count == 0)
                 {
                     Console.WriteLine("You haven't sent any requests yet");
@@ -300,14 +296,9 @@ while (running)
 
             case "6":
                 Console.WriteLine("═════╡ List of trades waiting for a decision ╞═════");
-                List<Trade> tradesinPending = new List<Trade>();
-                foreach (Trade trade in trades)
-                {
-                    if (trade.To.Email == active_user.Email && trade.Status == Trade.TradingStatus.Pending)
-                    {
-                        tradesinPending.Add(trade);
-                    }
-                }
+
+                var tradesinPending = db.GetReceivedTrades(active_user);
+
                 if (tradesinPending.Count == 0)
                 {
                     Console.WriteLine("You have no trades waiting for a decision");
@@ -354,6 +345,7 @@ while (running)
                     selectedTrade.OfferedItem.Owner = active_user;
 
                     selectedTrade.Status = Trade.TradingStatus.Accepted;
+                    db.UpdateTradeStatus(selectedTrade.TradeID, Trade.TradingStatus.Denied);
                     Console.WriteLine("Trade has been accepted");
                 }
                 else if (decision == "n" || decision == "N")
