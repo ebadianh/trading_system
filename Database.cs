@@ -239,6 +239,74 @@ class Database
 
         return trades;
     }
+    public List<Trade> GetSentTrades(User user)
+    {
+        var trades = new List<Trade>();
+        using var connection = new MySqlConnection(db);
+        try
+        {
+            connection.Open();
+            string query = @"SELECT t.TradeID, t.FromUserID, t.ToUserID, t.RequestedItemID, t.OfferedItemID, t.Status,
+                               u_from.Email as FromEmail, u_from.User_Password,
+                               u_to.Email as ToEmail, u_to.User_Password as ToPassword,
+                               i_req.ItemName as ReqItemName, i_req.Description as ReqItemDesc, i_req.OwnerID as ReqOwnerID,
+                               i_off.ItemName as OffItemName, i_off.Description as OffItemDesc, i_off.OwnerID as OffOwnerID
+                        FROM trades t
+                        JOIN users u_from ON t.FromUserID = u_from.UserID
+                        JOIN users u_to ON t.ToUserID = u_to.UserID
+                        JOIN items i_req ON t.RequestedItemID = i_req.ItemID
+                        LEFT JOIN items i_off ON t.OfferedItemID = i_off.ItemID
+                        WHERE t.FromUserID = @userId";
+
+            using var sqlcmd = new MySqlCommand(query, connection);
+            sqlcmd.Parameters.AddWithValue("@userId", user.UserID);
+            using var reader = sqlcmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                User fromUser = new User(reader["FromEmail"].ToString() ?? "", reader["User_Password"].ToString() ?? "")
+                {
+                    UserID = Convert.ToInt32(reader["FromUserID"])
+                };
+
+                User toUser = new User(reader["ToEmail"].ToString() ?? "", reader["ToPassword"].ToString() ?? "")
+                {
+                    UserID = Convert.ToInt32(reader["ToUserID"])
+                };
+
+                Item requestedItem = new Item(reader["ReqItemName"].ToString() ?? "", reader["ReqItemDesc"].ToString() ?? "", fromUser)
+                {
+                    ItemID = Convert.ToInt32(reader["RequestedItemID"])
+                };
+
+                Item? offeredItem = null;
+                if (reader["OfferedItemID"] != DBNull.Value)
+                {
+                    offeredItem = new Item(reader["OffItemName"].ToString() ?? "", reader["OffItemDesc"].ToString() ?? "", toUser)
+                    {
+                        ItemID = Convert.ToInt32(reader["OfferedItemID"])
+                    };
+                }
+
+                Trade trade = new Trade(
+                    Convert.ToInt32(reader["TradeID"]),
+                    fromUser,
+                    toUser,
+                    requestedItem,
+                    offeredItem,
+                    Enum.Parse<Trade.TradingStatus>(reader["Status"].ToString() ?? "Pending")
+                );
+
+                trades.Add(trade);
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine("Fel vid hämtning av skickade trades: " + error.Message);
+        }
+
+        return trades;
+    }
     public void UpdateTradeStatus(int tradeId, Trade.TradingStatus status)
     {
         using var connection = new MySqlConnection(db);
@@ -274,6 +342,70 @@ class Database
         {
             Console.WriteLine("Fel vid uppdatering av item-owner: " + error.Message);
         }
+    }
+
+    public List<Trade> GetAllCompletedTrades()
+    {
+        var trades = new List<Trade>();
+        using var connection = new MySqlConnection(db);
+        try
+        {
+            connection.Open();
+            string query = @"SELECT t.TradeID, t.Status,
+                                    t.FromUserID, f.Email AS FromEmail,
+                                    t.ToUserID, to_u.Email AS ToEmail,
+                                    ri.ItemID AS RequestedItemID, ri.ItemName AS RequestedItemName, ri.Description AS RequestedItemDesc,
+                                    oi.ItemID AS OfferedItemID, oi.ItemName AS OfferedItemName, oi.Description AS OfferedItemDesc
+                             FROM trades t
+                             JOIN users f ON t.FromUserID = f.UserID
+                             JOIN users to_u ON t.ToUserID = to_u.UserID
+                             JOIN items ri ON t.RequestedItemID = ri.ItemID
+                             LEFT JOIN items oi ON t.OfferedItemID = oi.ItemID
+                             WHERE t.Status = 'Completed'";
+            using var sqlcmd = new MySqlCommand(query, connection);
+            using var reader = sqlcmd.ExecuteReader();
+
+            while (reader.Read())
+            {
+                var fromUser = new User(reader["FromEmail"].ToString() ?? "", "")
+                {
+                    UserID = Convert.ToInt32(reader["FromUserID"])
+                };
+
+                var toUser = new User(reader["ToEmail"].ToString() ?? "", "")
+                {
+                    UserID = Convert.ToInt32(reader["ToUserID"])
+                };
+
+                var requestedItem = new Item(reader["RequestedItemName"].ToString() ?? "",
+                                             reader["RequestedItemDesc"].ToString() ?? "",
+                                             fromUser)
+                {
+                    ItemID = Convert.ToInt32(reader["RequestedItemID"])
+                };
+
+                Item? offeredItem = null;
+                if (reader["OfferedItemID"] != DBNull.Value)
+                {
+                    offeredItem = new Item(reader["OfferedItemName"].ToString() ?? "",
+                                           reader["OfferedItemDesc"].ToString() ?? "",
+                                           toUser)
+                    {
+                        ItemID = Convert.ToInt32(reader["OfferedItemID"])
+                    };
+                }
+
+                var status = Enum.Parse<Trade.TradingStatus>(reader["Status"].ToString() ?? "Completed");
+
+                trades.Add(new Trade(Convert.ToInt32(reader["TradeID"]), fromUser, toUser, requestedItem, offeredItem, status));
+            }
+        }
+        catch (Exception error)
+        {
+            Console.WriteLine("Fel vid hämtning av completed trades: " + error.Message);
+        }
+
+        return trades;
     }
 
 }

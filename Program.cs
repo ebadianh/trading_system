@@ -18,16 +18,16 @@ while (running)
 {
     if (active_user == null)
     {
-        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("═════╡ Welcome to the trading market ╞═════");
         Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.DarkBlue;
+        Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("1. Create an account");
-        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.WriteLine("2. Login");
-        Console.ForegroundColor = ConsoleColor.DarkBlue;
+        Console.ForegroundColor = ConsoleColor.White;
         Console.WriteLine("3. Exit");
-        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.ForegroundColor = ConsoleColor.Blue;
         Console.Write("Please choose your option: ");
         Console.ResetColor();
 
@@ -52,7 +52,9 @@ while (running)
                 }
                 if (exist)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Username is already taken.");
+                    Console.ResetColor();
                 }
                 else
                 {
@@ -61,7 +63,9 @@ while (running)
 
                     db.SaveUser(newUser);
 
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Your account has been created!");
+                    Console.ResetColor();
                 }
                 break;
 
@@ -82,7 +86,9 @@ while (running)
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Login failed. Incorrect username or password.");
+                        Console.ResetColor();
                     }
                 }
                 break;
@@ -125,7 +131,9 @@ while (running)
 
                 if (ItemName == "")
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Invalid input, please try again");
+                    Console.ResetColor();
                     break;
                 }
                 Console.WriteLine("Give a short description of your item");
@@ -133,7 +141,9 @@ while (running)
 
                 if (ItemDesc == "")
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Invalid input, please try again");
+                    Console.ResetColor();
                     break;
                 }
                 Item newItem = new Item(ItemName, ItemDesc, active_user);
@@ -144,8 +154,8 @@ while (running)
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Item has been successfully uploaded");
-                Console.WriteLine();
                 Console.ResetColor();
+                Console.WriteLine();
                 break;
 
             case "2":
@@ -156,7 +166,9 @@ while (running)
 
                     if (allItems.Count == 0)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("No items have been uploaded yet.");
+                        Console.ResetColor();
                     }
                     else
                     {
@@ -179,7 +191,9 @@ while (running)
 
                 if (userItems.Count == 0)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("You haven't uploaded any items yet.");
+                    Console.ResetColor();
                 }
                 else
                 {
@@ -203,7 +217,9 @@ while (running)
 
                     if (allItems.Count == 0)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("No items are available for trading");
+                        Console.ResetColor();
                         break;
                     }
 
@@ -214,9 +230,11 @@ while (running)
 
                     string RequestInput = Console.ReadLine() ?? "";
 
-                    if (!int.TryParse(RequestInput, out int RequestChoice) || RequestChoice < 1 || RequestChoice > allItems.Count)  // från text till heltal
+                    if (!int.TryParse(RequestInput, out int RequestChoice) || RequestChoice < 1 || RequestChoice > allItems.Count)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Invalid choice");
+                        Console.ResetColor();
                         break;
                     }
 
@@ -224,13 +242,17 @@ while (running)
 
                     if (requesteditem.Owner.UserID == active_user.UserID)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Sorry, you can't choose your own item");
+                        Console.ResetColor();
                         break;
                     }
 
                     if (active_user.Items.Count == 0)
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("You have no items to offer");
+                        Console.ResetColor();
                         break;
                     }
 
@@ -255,18 +277,22 @@ while (running)
 
                     db.SaveTrade(newTrade);
 
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Request has been sent");
+                    Console.ResetColor();
                     break;
                 }
 
             case "5":
                 Console.WriteLine("═════╡ See your sent trade requests ╞═════");
 
-                var sentTrades = new List<Trade>();
+                var sentTrades = db.GetSentTrades(active_user);
 
                 if (sentTrades.Count == 0)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("You haven't sent any requests yet");
+                    Console.ResetColor();
                     Console.WriteLine();
                     break;
                 }
@@ -284,7 +310,9 @@ while (running)
                     }
                     else
                     {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("No item has been offered");
+                        Console.ResetColor();
                         Console.WriteLine();
                     }
                     Console.WriteLine("Status: " + trade.Status);
@@ -302,7 +330,9 @@ while (running)
 
                 if (tradesinPending.Count == 0)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("You have no trades waiting for a decision");
+                    Console.ResetColor();
                     break;
                 }
 
@@ -313,7 +343,7 @@ while (running)
                     Console.WriteLine("Request number: " + (i + 1));
                     Console.WriteLine("From: " + trade.From.Email);
                     Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
-                    Console.WriteLine("Offered item: " + trade.OfferedItem.Info2());
+                    Console.WriteLine("Offered item: " + (trade.OfferedItem != null ? trade.OfferedItem.Info2() : "No item offered"));
                     Console.WriteLine("Status: " + trade.Status);
                 }
 
@@ -326,7 +356,9 @@ while (running)
 
                 if (!int.TryParse(responseInput, out responseChoice) || responseChoice < 1 || responseChoice > tradesinPending.Count)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Invalid choice");
+                    Console.ResetColor();
                     break;
                 }
 
@@ -337,62 +369,66 @@ while (running)
 
                 if (decision == "y" || decision == "Y")
                 {
-                    selectedTrade.RequestedItem.Owner.Items.Remove(selectedTrade.RequestedItem);
-                    selectedTrade.From.Items.Add(selectedTrade.RequestedItem);
                     selectedTrade.RequestedItem.Owner = selectedTrade.From;
+                    db.UpdateItemOwner(selectedTrade.RequestedItem.ItemID, selectedTrade.From.UserID);
 
-                    selectedTrade.From.Items.Remove(selectedTrade.OfferedItem);
-                    active_user.Items.Add(selectedTrade.OfferedItem);
-                    selectedTrade.OfferedItem.Owner = active_user;
+                    if (selectedTrade.OfferedItem != null)
+                    {
+                        selectedTrade.OfferedItem.Owner = active_user;
+                        db.UpdateItemOwner(selectedTrade.OfferedItem.ItemID, active_user.UserID);
+                    }
 
-                    selectedTrade.Status = Trade.TradingStatus.Accepted;
-                    db.UpdateTradeStatus(selectedTrade.TradeID, Trade.TradingStatus.Denied);
-                    Console.WriteLine("Trade has been accepted");
+
+                    selectedTrade.Status = Trade.TradingStatus.Completed;
+                    db.UpdateTradeStatus(selectedTrade.TradeID, selectedTrade.Status);
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine("Trade has been accepted and completed");
+                    Console.ResetColor();
                 }
                 else if (decision == "n" || decision == "N")
                 {
                     selectedTrade.Status = Trade.TradingStatus.Denied;
+                    db.UpdateTradeStatus(selectedTrade.TradeID, selectedTrade.Status);
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Trade has been denied");
+                    Console.ResetColor();
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Invalid input. Trade remains pending");
+                    Console.ResetColor();
                 }
                 break;
 
             case "7":
-                Console.WriteLine("═════╡ All of the completed trades ╞═════");
-                List<Trade> completedTrades = new List<Trade>();
-                foreach (Trade trade in trades)
                 {
-                    if (trade.Status == Trade.TradingStatus.Accepted || trade.Status == Trade.TradingStatus.Denied)
-                    {
-                        completedTrades.Add(trade);
-                    }
-                }
+                    Console.WriteLine("═════╡ Completed trades (all users) ╞═════");
 
-                if (completedTrades.Count == 0)
-                {
-                    Console.WriteLine("No trades have been completed yet");
+                    var completedTrades = db.GetAllCompletedTrades();
+
+                    if (completedTrades.Count == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("No completed trades found.");
+                        Console.ResetColor();
+                        break;
+                    }
+
+                    for (int i = 0; i < completedTrades.Count; ++i)
+                    {
+                        var trade = completedTrades[i];
+                        Console.WriteLine("═══════════════════════════════════");
+                        Console.WriteLine("Trade number: " + (i + 1));
+                        Console.WriteLine("From: " + trade.From.Email);
+                        Console.WriteLine("To: " + trade.To.Email);
+                        Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
+                        Console.WriteLine("Offered item: " + (trade.OfferedItem != null ? trade.OfferedItem.Info2() : "No item offered"));
+                        Console.WriteLine("Status: " + trade.Status);
+                    }
+
                     break;
                 }
-
-                for (int i = 0; i < completedTrades.Count; ++i)
-                {
-                    Trade trade = completedTrades[i];
-                    Console.WriteLine("═══════════════════════════════════");
-                    Console.WriteLine("Trade number: " + (i + 1));
-                    Console.WriteLine("From: " + trade.From.Email);
-                    Console.WriteLine("To: " + trade.To.Email);
-                    Console.WriteLine("Requested item: " + trade.RequestedItem.Info2());
-                    Console.WriteLine("Offered item: " + trade.OfferedItem.Info2());
-                    Console.WriteLine("Status: " + Trade.TradingStatus.Completed);
-                }
-
-                Console.WriteLine();
-                Console.WriteLine("Press enter to go back...");
-                Console.ReadLine();
-                break;
 
             case "8":
                 active_user = null;
@@ -403,7 +439,9 @@ while (running)
                 break;
 
             default:
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("Invalid input, please try again");
+                Console.ResetColor();
                 break;
         }
     }
